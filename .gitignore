@@ -1,0 +1,17 @@
+# Test files
+tmp/
+
+# Design documents
+docs/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+
+# Build
+jf
