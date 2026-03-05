@@ -59,3 +59,35 @@ func TestFormatPriceDecl(t *testing.T) {
 		t.Errorf("formatPriceDecl() = %q, want %q", got, want)
 	}
 }
+
+func TestCalculateWidths(t *testing.T) {
+	journal := &types.Journal{
+		Items: []types.Item{
+			&types.Transaction{
+				Postings: []types.Posting{
+					{Account: "expenses:subscription:icloud", Amount: "21", Commodity: "CNY"},
+					{Account: "assets:wechat"},
+				},
+			},
+			&types.Transaction{
+				Postings: []types.Posting{
+					{Account: "expenses:electronics", Amount: "1719", Commodity: "CNY"},
+					{Account: "assets:alipay"},
+				},
+			},
+		},
+	}
+
+	f := NewFormatter()
+	f.calculateWidths(journal)
+
+	if f.AccountWidth != len("expenses:subscription:icloud") {
+		t.Errorf("AccountWidth = %d, want %d", f.AccountWidth, len("expenses:subscription:icloud"))
+	}
+	if f.AmountWidth != len("1719") {
+		t.Errorf("AmountWidth = %d, want %d", f.AmountWidth, len("1719"))
+	}
+	if f.CommodityWidth != len("CNY") {
+		t.Errorf("CommodityWidth = %d, want %d", f.CommodityWidth, len("CNY"))
+	}
+}

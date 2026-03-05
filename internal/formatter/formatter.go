@@ -33,3 +33,23 @@ func (f *Formatter) formatComment(c *types.Comment) string {
 func (f *Formatter) formatPriceDecl(p *types.PriceDecl) string {
 	return fmt.Sprintf("P %s %s %s %s", p.Date, p.Commodity, p.Price, p.TargetCommodity)
 }
+
+func (f *Formatter) calculateWidths(journal *types.Journal) {
+	for _, item := range journal.Items {
+		tx, ok := item.(*types.Transaction)
+		if !ok {
+			continue
+		}
+		for _, posting := range tx.Postings {
+			if len(posting.Account) > f.AccountWidth {
+				f.AccountWidth = len(posting.Account)
+			}
+			if len(posting.Amount) > f.AmountWidth {
+				f.AmountWidth = len(posting.Amount)
+			}
+			if len(posting.Commodity) > f.CommodityWidth {
+				f.CommodityWidth = len(posting.Commodity)
+			}
+		}
+	}
+}
