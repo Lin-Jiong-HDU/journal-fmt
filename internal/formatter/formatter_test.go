@@ -208,3 +208,43 @@ func TestFormat(t *testing.T) {
 		t.Error("missing second transaction")
 	}
 }
+
+func TestSortTransactions(t *testing.T) {
+	journal := &types.Journal{
+		Items: []types.Item{
+			&types.Transaction{
+				Date:        "2026-03-04",
+				Description: "Third",
+				Postings:    []types.Posting{{Account: "a"}},
+			},
+			&types.Comment{Text: "comment"},
+			&types.Transaction{
+				Date:        "2026-03-02",
+				Description: "First",
+				Postings:    []types.Posting{{Account: "a"}},
+			},
+			&types.Transaction{
+				Date:        "2026-03-03",
+				Description: "Second",
+				Postings:    []types.Posting{{Account: "a"}},
+			},
+		},
+	}
+
+	f := NewFormatter()
+	sorted := f.sortTransactions(journal)
+
+	tx1 := sorted.Items[0].(*types.Transaction)
+	tx2 := sorted.Items[2].(*types.Transaction)
+	tx3 := sorted.Items[3].(*types.Transaction)
+
+	if tx1.Description != "First" {
+		t.Errorf("first transaction = %q, want %q", tx1.Description, "First")
+	}
+	if tx2.Description != "Second" {
+		t.Errorf("second transaction = %q, want %q", tx2.Description, "Second")
+	}
+	if tx3.Description != "Third" {
+		t.Errorf("third transaction = %q, want %q", tx3.Description, "Third")
+	}
+}

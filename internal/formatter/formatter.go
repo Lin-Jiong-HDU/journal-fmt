@@ -4,6 +4,7 @@ package formatter
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/Lin-Jiong-HDU/journal-fmt/internal/types"
@@ -20,6 +21,9 @@ func NewFormatter() *Formatter {
 }
 
 func (f *Formatter) Format(journal *types.Journal) string {
+	// Sort transactions by date
+	journal = f.sortTransactions(journal)
+
 	// First pass: calculate column widths
 	f.calculateWidths(journal)
 
@@ -116,4 +120,39 @@ func (f *Formatter) formatTransaction(tx *types.Transaction) string {
 	}
 
 	return strings.TrimSuffix(sb.String(), "\n")
+}
+
+func (f *Formatter) sortTransactions(journal *types.Journal) *types.Journal {
+	// Extract transactions with their positions
+	type txWithPos struct {
+		tx  *types.Transaction
+		pos int
+	}
+	var transactions []txWithPos
+
+	for i, item := range journal.Items {
+		if tx, ok := item.(*types.Transaction); ok {
+			transactions = append(transactions, txWithPos{tx: tx, pos: i})
+		}
+	}
+
+	// Sort by date
+	sort.Slice(transactions, func(i, j int) bool {
+		return transactions[i].tx.Date < transactions[j].tx.Date
+	})
+
+	// Create new journal with sorted transactions
+	newJournal := &types.Journal{Items: make([]types.Item, len(journal.Items))}
+	copy(newJournal.Items, journal.Items)
+
+	// Put sorted transactions back
+	txIdx := 0
+	for i, item := range journal.Items {
+		if _, ok := item.(*types.Transaction); ok {
+			newJournal.Items[i] = transactions[txIdx].tx
+			txIdx++
+		}
+	}
+
+	return newJournal
 }
