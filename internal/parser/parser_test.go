@@ -86,3 +86,39 @@ func TestParsePriceDecl(t *testing.T) {
 		t.Errorf("TargetCommodity = %q, want %q", priceDecl.TargetCommodity, "USD 7.20")
 	}
 }
+
+func TestParseTransaction(t *testing.T) {
+	input := `2026/03/02 * Apple iCloud+ 订阅
+    expenses:subscription:icloud      21 CNY
+    assets:wechat`
+	p := NewParser(input)
+	journal, err := p.Parse()
+	if err != nil {
+		t.Fatalf("Parse() error = %v", err)
+	}
+	if len(journal.Items) != 1 {
+		t.Fatalf("expected 1 item, got %d", len(journal.Items))
+	}
+	tx := journal.Items[0].(*types.Transaction)
+	if tx.Date != "2026-03-02" {
+		t.Errorf("Date = %q, want %q", tx.Date, "2026-03-02")
+	}
+	if tx.Status != "*" {
+		t.Errorf("Status = %q, want %q", tx.Status, "*")
+	}
+	if tx.Description != "Apple iCloud+ 订阅" {
+		t.Errorf("Description = %q, want %q", tx.Description, "Apple iCloud+ 订阅")
+	}
+	if len(tx.Postings) != 2 {
+		t.Fatalf("expected 2 postings, got %d", len(tx.Postings))
+	}
+	if tx.Postings[0].Account != "expenses:subscription:icloud" {
+		t.Errorf("Account = %q", tx.Postings[0].Account)
+	}
+	if tx.Postings[0].Amount != "21" {
+		t.Errorf("Amount = %q", tx.Postings[0].Amount)
+	}
+	if tx.Postings[0].Commodity != "CNY" {
+		t.Errorf("Commodity = %q", tx.Postings[0].Commodity)
+	}
+}
