@@ -20,8 +20,28 @@ func NewFormatter() *Formatter {
 }
 
 func (f *Formatter) Format(journal *types.Journal) string {
-	// TODO: implement full formatting
-	return ""
+	// First pass: calculate column widths
+	f.calculateWidths(journal)
+
+	var sb strings.Builder
+
+	for _, item := range journal.Items {
+		switch v := item.(type) {
+		case *types.Comment:
+			sb.WriteString(f.formatComment(v))
+			sb.WriteString("\n")
+		case *types.PriceDecl:
+			sb.WriteString(f.formatPriceDecl(v))
+			sb.WriteString("\n")
+		case *types.Transaction:
+			sb.WriteString(f.formatTransaction(v))
+			sb.WriteString("\n")
+		case *types.EmptyLine:
+			sb.WriteString("\n")
+		}
+	}
+
+	return strings.TrimSuffix(sb.String(), "\n") + "\n"
 }
 
 func (f *Formatter) formatComment(c *types.Comment) string {

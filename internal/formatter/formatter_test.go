@@ -3,6 +3,7 @@
 package formatter
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/Lin-Jiong-HDU/journal-fmt/internal/types"
@@ -163,5 +164,47 @@ func TestFormatTransaction(t *testing.T) {
 	got := f.formatTransaction(tx)
 	if got != want {
 		t.Errorf("formatTransaction() = %q, want %q", got, want)
+	}
+}
+
+func TestFormat(t *testing.T) {
+	journal := &types.Journal{
+		Items: []types.Item{
+			&types.Comment{Text: "2026年3月交易", IsTag: false},
+			&types.EmptyLine{},
+			&types.Transaction{
+				Date:        "2026-03-02",
+				Status:      "*",
+				Description: "Apple iCloud+ 订阅",
+				Postings: []types.Posting{
+					{Account: "expenses:subscription:icloud", Amount: "21", Commodity: "CNY"},
+					{Account: "assets:wechat"},
+				},
+			},
+			&types.EmptyLine{},
+			&types.Transaction{
+				Date:        "2026-03-02",
+				Status:      "*",
+				Description: "Apple Music 订阅",
+				Postings: []types.Posting{
+					{Account: "expenses:subscription:music", Amount: "6", Commodity: "CNY"},
+					{Account: "assets:wechat"},
+				},
+			},
+		},
+	}
+
+	f := NewFormatter()
+	got := f.Format(journal)
+
+	// Check that output contains expected elements
+	if !strings.Contains(got, "; 2026年3月交易") {
+		t.Error("missing comment")
+	}
+	if !strings.Contains(got, "2026-03-02 * Apple iCloud+ 订阅") {
+		t.Error("missing first transaction")
+	}
+	if !strings.Contains(got, "2026-03-02 * Apple Music 订阅") {
+		t.Error("missing second transaction")
 	}
 }
