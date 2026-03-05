@@ -122,3 +122,65 @@ func TestParseTransaction(t *testing.T) {
 		t.Errorf("Commodity = %q", tx.Postings[0].Commodity)
 	}
 }
+
+func TestParseFullFile(t *testing.T) {
+	content := `; 2026年3月交易
+; Monthly journal file
+
+P 2026/03/01 CNY 1.00 USD 7.20
+
+; =======================================
+; Apple 订阅服务
+; =======================================
+2026/03/02 * Apple iCloud+ 订阅
+    expenses:subscription:icloud      21 CNY
+    assets:wechat
+
+2026/03/02 * Apple Music 订阅
+    expenses:subscription:music      6 CNY
+    assets:wechat
+
+; =======================================
+; 日常开销
+; =======================================
+2026/03/02 * 夜宵（炒粉干） ;  夜宵:
+    expenses:food:meal               21 CNY
+    assets:wechat
+`
+	p := NewParser(content)
+	journal, err := p.Parse()
+	if err != nil {
+		t.Fatalf("Parse() error = %v", err)
+	}
+
+	// Count item types
+	comments := 0
+	priceDecls := 0
+	transactions := 0
+	emptyLines := 0
+	for _, item := range journal.Items {
+		switch item.(type) {
+		case *types.Comment:
+			comments++
+		case *types.PriceDecl:
+			priceDecls++
+		case *types.Transaction:
+			transactions++
+		case *types.EmptyLine:
+			emptyLines++
+		}
+	}
+
+	if comments != 8 {
+		t.Errorf("expected 8 comments, got %d", comments)
+	}
+	if priceDecls != 1 {
+		t.Errorf("expected 1 price declaration, got %d", priceDecls)
+	}
+	if transactions != 3 {
+		t.Errorf("expected 3 transactions, got %d", transactions)
+	}
+	if emptyLines < 2 {
+		t.Errorf("expected at least 2 empty lines, got %d", emptyLines)
+	}
+}
