@@ -4,6 +4,7 @@ package formatter
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/Lin-Jiong-HDU/journal-fmt/internal/types"
 )
@@ -52,4 +53,21 @@ func (f *Formatter) calculateWidths(journal *types.Journal) {
 			}
 		}
 	}
+}
+
+func (f *Formatter) formatPosting(p types.Posting) string {
+	// Account: left-aligned, padded to AccountWidth
+	account := fmt.Sprintf("%-*s", f.AccountWidth, p.Account)
+
+	if p.Amount == "" {
+		return "    " + strings.TrimRight(account, " ")
+	}
+
+	// Amount: right-aligned, padded to AmountWidth
+	amount := fmt.Sprintf("%*s", f.AmountWidth, p.Amount)
+
+	// Commodity: left-aligned, padded to CommodityWidth
+	commodity := fmt.Sprintf("%-*s", f.CommodityWidth, p.Commodity)
+
+	return fmt.Sprintf("    %s %s %s", account, amount, commodity)
 }

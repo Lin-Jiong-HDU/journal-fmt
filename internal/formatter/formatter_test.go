@@ -91,3 +91,51 @@ func TestCalculateWidths(t *testing.T) {
 		t.Errorf("CommodityWidth = %d, want %d", f.CommodityWidth, len("CNY"))
 	}
 }
+
+func TestFormatPosting(t *testing.T) {
+	f := NewFormatter()
+	f.AccountWidth = 30
+	f.AmountWidth = 6
+	f.CommodityWidth = 3
+
+	tests := []struct {
+		name    string
+		posting types.Posting
+		want    string
+	}{
+		{
+			name: "posting with amount",
+			posting: types.Posting{
+				Account:   "expenses:subscription:icloud",
+				Amount:    "21",
+				Commodity: "CNY",
+			},
+			want: "    expenses:subscription:icloud       21 CNY",
+		},
+		{
+			name: "posting without amount",
+			posting: types.Posting{
+				Account: "assets:wechat",
+			},
+			want: "    assets:wechat",
+		},
+		{
+			name: "posting with larger amount",
+			posting: types.Posting{
+				Account:   "expenses:electronics",
+				Amount:    "1719",
+				Commodity: "CNY",
+			},
+			want: "    expenses:electronics             1719 CNY",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := f.formatPosting(tt.posting)
+			if got != tt.want {
+				t.Errorf("formatPosting() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
