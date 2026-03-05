@@ -3,6 +3,8 @@
 package formatter
 
 import (
+	"fmt"
+
 	"github.com/Lin-Jiong-HDU/journal-fmt/internal/types"
 )
 
@@ -26,4 +28,8 @@ func (f *Formatter) formatComment(c *types.Comment) string {
 		return ";  " + c.Text
 	}
 	return "; " + c.Text
+}
+
+func (f *Formatter) formatPriceDecl(p *types.PriceDecl) string {
+	return fmt.Sprintf("P %s %s %s %s", p.Date, p.Commodity, p.Price, p.TargetCommodity)
 }

@@ -42,3 +42,20 @@ func TestFormatComment(t *testing.T) {
 		})
 	}
 }
+
+func TestFormatPriceDecl(t *testing.T) {
+	f := NewFormatter()
+
+	priceDecl := &types.PriceDecl{
+		Date:            "2026-03-01",
+		Commodity:       "CNY",
+		Price:           "1.00",
+		TargetCommodity: "USD 7.20",
+	}
+
+	want := "P 2026-03-01 CNY 1.00 USD 7.20"
+	got := f.formatPriceDecl(priceDecl)
+	if got != want {
+		t.Errorf("formatPriceDecl() = %q, want %q", got, want)
+	}
+}
