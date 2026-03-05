@@ -22,21 +22,21 @@ func (c *Comment) isItem() {}
 
 // PriceDecl 价格声明 (P 2026/03/01 CNY 1.00 USD 7.20)
 type PriceDecl struct {
-	Date             string
-	Commodity        string
-	Price            string
-	TargetCommodity  string
+	Date            string
+	Commodity       string
+	Price           string
+	TargetCommodity string
 }
 
 func (p *PriceDecl) isItem() {}
 
 // Transaction 交易
 type Transaction struct {
-	Date        string     // 日期
-	Status      string     // "*", "!", 或空
-	Description string     // 描述
-	Postings    []Posting  // 分录
-	Comment     string     // 行尾注释（可选）
+	Date        string    // 日期
+	Status      string    // "*", "!", 或空
+	Description string    // 描述
+	Postings    []Posting // 分录
+	Comment     string    // 行尾注释（可选）
 }
 
 func (t *Transaction) isItem() {}
