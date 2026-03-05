@@ -3,6 +3,7 @@
 package parser
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -40,6 +41,17 @@ func (p *Parser) Parse() (*types.Journal, error) {
 			continue
 		}
 
+		// Check for price declaration
+		if strings.HasPrefix(strings.TrimSpace(line), "P ") {
+			priceDecl, err := p.parsePriceDecl(line)
+			if err != nil {
+				return nil, err
+			}
+			journal.Items = append(journal.Items, priceDecl)
+			p.pos++
+			continue
+		}
+
 		// TODO: handle other item types
 		p.pos++
 	}
@@ -67,4 +79,27 @@ func (p *Parser) parseComment(line string) *types.Comment {
 		Text:  strings.TrimLeft(content, " "),
 		IsTag: false,
 	}
+}
+
+func (p *Parser) parsePriceDecl(line string) (*types.PriceDecl, error) {
+	// Format: P DATE COMMODITY PRICE TARGET_COMMODITY TARGET_PRICE
+	// Example: P 2026/03/01 CNY 1.00 USD 7.20
+	parts := strings.Fields(strings.TrimPrefix(strings.TrimSpace(line), "P "))
+	if len(parts) < 4 {
+		return nil, fmt.Errorf("invalid price declaration: %s", line)
+	}
+
+	date := p.normalizeDate(parts[0])
+
+	return &types.PriceDecl{
+		Date:            date,
+		Commodity:       parts[1],
+		Price:           parts[2],
+		TargetCommodity: strings.Join(parts[3:], " "),
+	}, nil
+}
+
+func (p *Parser) normalizeDate(date string) string {
+	// Replace / and . with -
+	return strings.ReplaceAll(strings.ReplaceAll(date, "/", "-"), ".", "-")
 }

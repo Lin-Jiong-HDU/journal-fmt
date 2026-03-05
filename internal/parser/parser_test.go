@@ -61,3 +61,28 @@ func TestParseComment(t *testing.T) {
 		})
 	}
 }
+
+func TestParsePriceDecl(t *testing.T) {
+	input := "P 2026/03/01 CNY 1.00 USD 7.20"
+	p := NewParser(input)
+	journal, err := p.Parse()
+	if err != nil {
+		t.Fatalf("Parse() error = %v", err)
+	}
+	if len(journal.Items) != 1 {
+		t.Fatalf("expected 1 item, got %d", len(journal.Items))
+	}
+	priceDecl := journal.Items[0].(*types.PriceDecl)
+	if priceDecl.Date != "2026-03-01" {
+		t.Errorf("Date = %q, want %q", priceDecl.Date, "2026-03-01")
+	}
+	if priceDecl.Commodity != "CNY" {
+		t.Errorf("Commodity = %q, want %q", priceDecl.Commodity, "CNY")
+	}
+	if priceDecl.Price != "1.00" {
+		t.Errorf("Price = %q, want %q", priceDecl.Price, "1.00")
+	}
+	if priceDecl.TargetCommodity != "USD 7.20" {
+		t.Errorf("TargetCommodity = %q, want %q", priceDecl.TargetCommodity, "USD 7.20")
+	}
+}
