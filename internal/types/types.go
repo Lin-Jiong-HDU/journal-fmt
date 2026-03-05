@@ -1,55 +1,53 @@
-// internal/types/types.go
-
 package types
 
-// Journal 表示整个账本文件
+// Journal represents a complete hledger journal file.
 type Journal struct {
 	Items []Item
 }
 
-// Item 表示文件中的一个条目
+// Item represents an entry in the journal file.
 type Item interface {
 	isItem()
 }
 
-// Comment 注释行
+// Comment represents a comment line.
 type Comment struct {
-	Text  string // 注释内容（不含分号）
-	IsTag bool   // 是否是 tag（;  tag: 格式）
+	Text  string // Comment text without semicolon
+	IsTag bool   // True if tag format (;  tag:)
 }
 
 func (c *Comment) isItem() {}
 
-// PriceDecl 价格声明 (P 2026/03/01 CNY 1.00 USD 7.20)
+// PriceDecl represents a price declaration (P directive).
 type PriceDecl struct {
-	Date            string
-	Commodity       string
-	Price           string
-	TargetCommodity string
+	Date             string
+	Commodity        string
+	Price            string
+	TargetCommodity  string
 }
 
 func (p *PriceDecl) isItem() {}
 
-// Transaction 交易
+// Transaction represents a transaction entry.
 type Transaction struct {
-	Date        string    // 日期
-	Status      string    // "*", "!", 或空
-	Description string    // 描述
-	Postings    []Posting // 分录
-	Comment     string    // 行尾注释（可选）
+	Date        string
+	Status      string     // "*", "!", or empty
+	Description string
+	Postings    []Posting
+	Comment     string
 }
 
 func (t *Transaction) isItem() {}
 
-// Posting 分录（账户 + 金额）
+// Posting represents an account posting within a transaction.
 type Posting struct {
-	Account   string // 账户名
-	Amount    string // 金额数值
-	Commodity string // 货币单位
-	Comment   string // 行尾注释（可选）
+	Account   string
+	Amount    string
+	Commodity string
+	Comment   string
 }
 
-// EmptyLine 空行
+// EmptyLine represents a blank line.
 type EmptyLine struct{}
 
 func (e *EmptyLine) isItem() {}

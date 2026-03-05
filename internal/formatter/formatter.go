@@ -1,5 +1,3 @@
-// internal/formatter/formatter.go
-
 package formatter
 
 import (
@@ -21,10 +19,7 @@ func NewFormatter() *Formatter {
 }
 
 func (f *Formatter) Format(journal *types.Journal) string {
-	// Sort transactions by date
 	journal = f.sortTransactions(journal)
-
-	// First pass: calculate column widths
 	f.calculateWidths(journal)
 
 	var sb strings.Builder
@@ -80,17 +75,13 @@ func (f *Formatter) calculateWidths(journal *types.Journal) {
 }
 
 func (f *Formatter) formatPosting(p types.Posting) string {
-	// Account: left-aligned, padded to AccountWidth
 	account := fmt.Sprintf("%-*s", f.AccountWidth, p.Account)
 
 	if p.Amount == "" {
 		return "    " + strings.TrimRight(account, " ")
 	}
 
-	// Amount: right-aligned, padded to AmountWidth
 	amount := fmt.Sprintf("%*s", f.AmountWidth, p.Amount)
-
-	// Commodity: left-aligned, padded to CommodityWidth
 	commodity := fmt.Sprintf("%-*s", f.CommodityWidth, p.Commodity)
 
 	return fmt.Sprintf("    %s %s %s", account, amount, commodity)
@@ -99,12 +90,9 @@ func (f *Formatter) formatPosting(p types.Posting) string {
 func (f *Formatter) formatTransaction(tx *types.Transaction) string {
 	var sb strings.Builder
 
-	// Header line
 	sb.WriteString(fmt.Sprintf("%s %s %s", tx.Date, tx.Status, tx.Description))
 
-	// Add comment if present
 	if tx.Comment != "" {
-		// Determine if it's a tag or regular comment
 		if strings.HasSuffix(tx.Comment, ":") {
 			sb.WriteString(fmt.Sprintf(" ;  %s", tx.Comment))
 		} else {
@@ -113,7 +101,6 @@ func (f *Formatter) formatTransaction(tx *types.Transaction) string {
 	}
 	sb.WriteString("\n")
 
-	// Postings
 	for _, posting := range tx.Postings {
 		sb.WriteString(f.formatPosting(posting))
 		sb.WriteString("\n")
@@ -123,7 +110,6 @@ func (f *Formatter) formatTransaction(tx *types.Transaction) string {
 }
 
 func (f *Formatter) sortTransactions(journal *types.Journal) *types.Journal {
-	// Extract transactions with their positions
 	type txWithPos struct {
 		tx  *types.Transaction
 		pos int
@@ -136,16 +122,13 @@ func (f *Formatter) sortTransactions(journal *types.Journal) *types.Journal {
 		}
 	}
 
-	// Sort by date
 	sort.Slice(transactions, func(i, j int) bool {
 		return transactions[i].tx.Date < transactions[j].tx.Date
 	})
 
-	// Create new journal with sorted transactions
 	newJournal := &types.Journal{Items: make([]types.Item, len(journal.Items))}
 	copy(newJournal.Items, journal.Items)
 
-	// Put sorted transactions back
 	txIdx := 0
 	for i, item := range journal.Items {
 		if _, ok := item.(*types.Transaction); ok {

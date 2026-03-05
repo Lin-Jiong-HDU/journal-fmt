@@ -1,5 +1,3 @@
-// cmd/jf/main.go
-
 package main
 
 import (

@@ -39,11 +39,11 @@ jf -w ./...
 
 ## Formatting Rules
 
-| Rule | Before | After |
-|------|--------|-------|
-| Date format | `2026/03/02` | `2026-03-02` |
-| Normal comment | `;  comment` | `; comment` |
-| Tag comment | `; tag:` | `;  tag:` |
+| Rule             | Before       | After         |
+| ---------------- | ------------ | ------------- |
+| Date format      | `2026/03/02` | `2026-03-02`  |
+| Normal comment   | `;  comment` | `; comment`   |
+| Tag comment      | `; tag:`     | `;  tag:`     |
 | Amount alignment | Inconsistent | Right-aligned |
 
 ### Example
