@@ -71,3 +71,29 @@ func (f *Formatter) formatPosting(p types.Posting) string {
 
 	return fmt.Sprintf("    %s %s %s", account, amount, commodity)
 }
+
+func (f *Formatter) formatTransaction(tx *types.Transaction) string {
+	var sb strings.Builder
+
+	// Header line
+	sb.WriteString(fmt.Sprintf("%s %s %s", tx.Date, tx.Status, tx.Description))
+
+	// Add comment if present
+	if tx.Comment != "" {
+		// Determine if it's a tag or regular comment
+		if strings.HasSuffix(tx.Comment, ":") {
+			sb.WriteString(fmt.Sprintf(" ;  %s", tx.Comment))
+		} else {
+			sb.WriteString(fmt.Sprintf(" ; %s", tx.Comment))
+		}
+	}
+	sb.WriteString("\n")
+
+	// Postings
+	for _, posting := range tx.Postings {
+		sb.WriteString(f.formatPosting(posting))
+		sb.WriteString("\n")
+	}
+
+	return strings.TrimSuffix(sb.String(), "\n")
+}

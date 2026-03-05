@@ -139,3 +139,29 @@ func TestFormatPosting(t *testing.T) {
 		})
 	}
 }
+
+func TestFormatTransaction(t *testing.T) {
+	f := NewFormatter()
+	f.AccountWidth = 30
+	f.AmountWidth = 6
+	f.CommodityWidth = 3
+
+	tx := &types.Transaction{
+		Date:        "2026-03-02",
+		Status:      "*",
+		Description: "Apple iCloud+ 订阅",
+		Postings: []types.Posting{
+			{Account: "expenses:subscription:icloud", Amount: "21", Commodity: "CNY"},
+			{Account: "assets:wechat"},
+		},
+	}
+
+	want := `2026-03-02 * Apple iCloud+ 订阅
+    expenses:subscription:icloud       21 CNY
+    assets:wechat`
+
+	got := f.formatTransaction(tx)
+	if got != want {
+		t.Errorf("formatTransaction() = %q, want %q", got, want)
+	}
+}
