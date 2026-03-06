@@ -51,3 +51,10 @@ type Posting struct {
 type EmptyLine struct{}
 
 func (e *EmptyLine) isItem() {}
+
+// RawLine represents an unrecognized line that should be preserved as-is.
+type RawLine struct {
+	Content string
+}
+
+func (r *RawLine) isItem() {}

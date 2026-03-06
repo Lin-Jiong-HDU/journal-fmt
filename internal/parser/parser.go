@@ -63,6 +63,8 @@ func (p *Parser) Parse() (*types.Journal, error) {
 			continue
 		}
 
+		// Preserve unrecognized lines (account, commodity, include directives, etc.)
+		journal.Items = append(journal.Items, &types.RawLine{Content: line})
 		p.pos++
 	}
 

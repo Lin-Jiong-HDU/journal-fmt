@@ -37,6 +37,9 @@ func (f *Formatter) Format(journal *types.Journal) string {
 			sb.WriteString("\n")
 		case *types.EmptyLine:
 			sb.WriteString("\n")
+		case *types.RawLine:
+			sb.WriteString(v.Content)
+			sb.WriteString("\n")
 		}
 	}
 
@@ -78,13 +81,21 @@ func (f *Formatter) formatPosting(p types.Posting) string {
 	account := fmt.Sprintf("%-*s", f.AccountWidth, p.Account)
 
 	if p.Amount == "" {
-		return "    " + strings.TrimRight(account, " ")
+		result := "    " + strings.TrimRight(account, " ")
+		if p.Comment != "" {
+			result += " ; " + p.Comment
+		}
+		return result
 	}
 
 	amount := fmt.Sprintf("%*s", f.AmountWidth, p.Amount)
 	commodity := fmt.Sprintf("%-*s", f.CommodityWidth, p.Commodity)
 
-	return fmt.Sprintf("    %s %s %s", account, amount, commodity)
+	result := fmt.Sprintf("    %s %s %s", account, amount, commodity)
+	if p.Comment != "" {
+		result += " ; " + p.Comment
+	}
+	return result
 }
 
 func (f *Formatter) formatTransaction(tx *types.Transaction) string {
