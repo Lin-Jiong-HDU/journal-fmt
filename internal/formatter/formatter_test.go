@@ -111,7 +111,7 @@ func TestFormatPosting(t *testing.T) {
 				Amount:    "21",
 				Commodity: "CNY",
 			},
-			want: "    expenses:subscription:icloud       21 CNY",
+			want: "    expenses:subscription:icloud        21 CNY",
 		},
 		{
 			name: "posting without amount",
@@ -127,7 +127,7 @@ func TestFormatPosting(t *testing.T) {
 				Amount:    "1719",
 				Commodity: "CNY",
 			},
-			want: "    expenses:electronics             1719 CNY",
+			want: "    expenses:electronics              1719 CNY",
 		},
 	}
 
@@ -158,7 +158,7 @@ func TestFormatTransaction(t *testing.T) {
 	}
 
 	want := `2026-03-02 * Apple iCloud+ 订阅
-    expenses:subscription:icloud       21 CNY
+    expenses:subscription:icloud        21 CNY
     assets:wechat`
 
 	got := f.formatTransaction(tx)

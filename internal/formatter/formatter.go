@@ -91,7 +91,7 @@ func (f *Formatter) formatPosting(p types.Posting) string {
 	amount := fmt.Sprintf("%*s", f.AmountWidth, p.Amount)
 	commodity := fmt.Sprintf("%-*s", f.CommodityWidth, p.Commodity)
 
-	result := fmt.Sprintf("    %s %s %s", account, amount, commodity)
+	result := fmt.Sprintf("    %s  %s %s", account, amount, commodity)
 	if p.Comment != "" {
 		result += " ; " + p.Comment
 	}
